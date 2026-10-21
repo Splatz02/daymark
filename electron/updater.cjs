@@ -65,7 +65,10 @@ function createUpdater({app,send,flush,quit,openExternal,fetcher=fetch,platform=
   try{
    const receipt=JSON.parse((await fs.readFile(path.join(directory(),'install-result.json'),'utf8')).replace(/^\uFEFF/,''));
    if(!receipt.success)state.receipt=receipt.message;
-   else if(receipt.version===app.getVersion())state.receipt=`Updated to Daymark ${receipt.version}.`;
+   else if(receipt.version===app.getVersion()){
+    state.receipt=`Updated to Daymark ${receipt.version}.`;
+    if(app.isPackaged&&receipt.confirmedVersion!==app.getVersion())await fs.writeFile(path.join(directory(),'install-result.json'),JSON.stringify({...receipt,confirmedVersion:app.getVersion(),reopenedAt:new Date().toISOString(),processId:process.pid}));
+   }
    else if(newer(receipt.version,app.getVersion()))state.receipt=`The update to Daymark ${receipt.version} did not apply. This copy is still ${app.getVersion()}. Try again from Settings & backups.`;
   }catch{}
   if(supported()){const initial=setTimeout(()=>check(false),8000);initial.unref();const timer=setInterval(()=>check(false),60*60*1000);timer.unref();}

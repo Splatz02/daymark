@@ -24,7 +24,8 @@ try {
   if (-not $TestMode) {
     $relaunch=@{FilePath=(Join-Path $resolvedDestination 'Daymark.exe');WindowStyle='Hidden';WorkingDirectory=$resolvedDestination}
     if ($UserDataDirectory) { $relaunch.ArgumentList='"--user-data-dir='+$UserDataDirectory+'"' }
-    Start-Process @relaunch
+    $reopened=Start-Process @relaunch -PassThru
+    Write-Output "Reopened Daymark as process $($reopened.Id) with data folder $UserDataDirectory"
   }
 } catch {
   Write-Output $_.Exception.Message

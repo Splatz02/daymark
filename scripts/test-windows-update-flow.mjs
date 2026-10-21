@@ -38,13 +38,14 @@ try{
  assert.equal(JSON.parse(asar.extractFile(path.join(installed,'resources/app.asar'),'package.json').toString()).version,pkg.version);
  const saved=JSON.parse(await fs.readFile(path.join(profile,'daymark.json'),'utf8'));assert.deepEqual(saved.tasks,data.tasks);assert.deepEqual(saved.workspaces,data.workspaces);
  const backups=(await fs.readdir(profile)).filter(name=>name.startsWith('daymark-before-update-1.1.1-'));assert.equal(backups.length,1);assert.deepEqual(JSON.parse(await fs.readFile(path.join(profile,backups[0]),'utf8')).tasks,data.tasks);
- for(let i=0;i<30;i++){
-  const output=execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',`Get-CimInstance Win32_Process -Filter "name = 'Daymark.exe'" | Where-Object { $_.ExecutablePath -eq ${quote(executable)} -and $_.CommandLine -like ${quote('*'+profile+'*')} -and $_.CommandLine -notlike '*--type=*' } | Select-Object -ExpandProperty ProcessId`],{encoding:'utf8',windowsHide:true}).trim();
-  if(output){restartedPid=Number(output.split(/\s+/)[0]);break;}await new Promise(resolve=>setTimeout(resolve,500));
+ for(let i=0;i<60;i++){
+  receipt=JSON.parse((await fs.readFile(record,'utf8')).replace(/^\uFEFF/,''));
+  if(receipt.confirmedVersion===pkg.version){restartedPid=receipt.processId;break;}await new Promise(resolve=>setTimeout(resolve,500));
  }
- assert.ok(restartedPid,'The updated app must reopen automatically with the same isolated profile.');
+ assert.ok(restartedPid,'The updated app must reopen and confirm its actual version in the same isolated profile.');
+ process.kill(restartedPid,0);
  console.log(`PASS: real 1.1.1 app detects/downloads ${pkg.version}, acknowledges the Windows helper, exits, installs ${pkg.version}, preserves both workspaces/checklist/notes, makes a backup, and automatically reopens the updated executable with the same data profile.`);
-}catch(error){for(const file of ['install.log','install-result.json','install-result.json.stdout.log','install-result.json.stderr.log']){try{console.error(file,await fs.readFile(path.join(profile,'updates',file),'utf8'));}catch{}}throw error;}
+}catch(error){for(const file of ['install.log','install-result.json','install-result.json.stdout.log','install-result.json.stderr.log']){try{console.error(file,await fs.readFile(path.join(profile,'updates',file),'utf8'));}catch{}}console.error(execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',"Get-CimInstance Win32_Process -Filter \"name = 'Daymark.exe'\" | Select-Object ProcessId,ParentProcessId,ExecutablePath,CommandLine | ConvertTo-Json"],{encoding:'utf8',windowsHide:true}));throw error;}
 finally{
  if(application)await application.close();
  if(restartedPid)execFileSync('taskkill.exe',['/PID',String(restartedPid),'/T','/F'],{stdio:'ignore',windowsHide:true});
