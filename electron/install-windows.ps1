@@ -22,7 +22,8 @@ try {
   if ($installedVersion -ne $Version) { throw 'The installed version does not match the downloaded update.' }
   @{success=$true;version=$Version} | ConvertTo-Json | Set-Content -LiteralPath $ResultFile -Encoding utf8
   if (-not $TestMode) {
-    $relaunch=@{FilePath=(Join-Path $resolvedDestination 'Daymark.exe');WindowStyle='Hidden';WorkingDirectory=$resolvedDestination}
+    # This is the user's interactive app, which must reopen visibly after updating.
+    $relaunch=@{FilePath=(Join-Path $resolvedDestination 'Daymark.exe');WindowStyle='Normal';WorkingDirectory=$resolvedDestination}
     if ($UserDataDirectory) { $relaunch.ArgumentList='"--user-data-dir='+$UserDataDirectory+'"' }
     $reopened=Start-Process @relaunch -PassThru
     Write-Output "Reopened Daymark as process $($reopened.Id) with data folder $UserDataDirectory"
@@ -31,7 +32,7 @@ try {
   Write-Output $_.Exception.Message
   @{success=$false;version=$Version;message="The update could not finish: $($_.Exception.Message). Your task data is preserved. Try again from Settings & backups."} | ConvertTo-Json | Set-Content -LiteralPath $ResultFile -Encoding utf8
   if ($parentClosed -and (-not $TestMode) -and (Test-Path -LiteralPath (Join-Path $Destination 'Daymark.exe'))) {
-    $relaunch=@{FilePath=(Join-Path $Destination 'Daymark.exe');WindowStyle='Hidden';WorkingDirectory=$Destination}
+    $relaunch=@{FilePath=(Join-Path $Destination 'Daymark.exe');WindowStyle='Normal';WorkingDirectory=$Destination}
     if ($UserDataDirectory) { $relaunch.ArgumentList='"--user-data-dir='+$UserDataDirectory+'"' }
     Start-Process @relaunch
   }

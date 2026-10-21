@@ -31,7 +31,10 @@ try{
  const page=await application.firstWindow();await page.getByRole('button',{name:'Settings & backups',exact:true}).click();await page.getByRole('button',{name:'Check for updates',exact:true}).click();
  await page.getByRole('button',{name:'Download update',exact:true}).click();
  await page.getByRole('button',{name:'Install & restart',exact:true}).last().waitFor({timeout:30000});
- const closed=application.waitForEvent('close',{timeout:30000});await page.getByRole('button',{name:'Install & restart',exact:true}).last().click();await closed;application=null;
+ // Watch the original process exit. Playwright's app "close" waits for inherited
+ // pipe handles, which can stay open in the independently reopened app on Windows.
+ const originalProcess=application.process();const exited=new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(new Error('The original app did not exit.')),30000);originalProcess.once('exit',()=>{clearTimeout(timeout);resolve();});});
+ await page.getByRole('button',{name:'Install & restart',exact:true}).last().click();await exited;application=null;
  const record=path.join(profile,'updates/install-result.json');let receipt;
  for(let i=0;i<240;i++){try{receipt=JSON.parse((await fs.readFile(record,'utf8')).replace(/^\uFEFF/,''));if(receipt.success)break;}catch{}await new Promise(resolve=>setTimeout(resolve,500));}
  assert.equal(receipt?.success,true,JSON.stringify(receipt));assert.equal(receipt.version,pkg.version);
@@ -44,7 +47,13 @@ try{
  }
  assert.ok(restartedPid,'The updated app must reopen and confirm its actual version in the same isolated profile.');
  process.kill(restartedPid,0);
- console.log(`PASS: real 1.1.1 app detects/downloads ${pkg.version}, acknowledges the Windows helper, exits, installs ${pkg.version}, preserves both workspaces/checklist/notes, makes a backup, and automatically reopens the updated executable with the same data profile.`);
+ let visible=false;
+ for(let i=0;i<30;i++){
+  const handle=execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',`(Get-Process -Id ${restartedPid}).MainWindowHandle.ToInt64()`],{encoding:'utf8',windowsHide:true}).trim();
+  if(Number(handle)>0){visible=true;break;}await new Promise(resolve=>setTimeout(resolve,500));
+ }
+ assert.equal(visible,true,'The reopened app must have a visible main window.');
+ console.log(`PASS: real 1.1.1 app detects/downloads ${pkg.version}, acknowledges the Windows helper, exits, installs ${pkg.version}, preserves both workspaces/checklist/notes, makes a backup, confirms its actual version, and automatically reopens with a visible window and the same data profile.`);
 }catch(error){for(const file of ['install.log','install-result.json','install-result.json.stdout.log','install-result.json.stderr.log']){try{console.error(file,await fs.readFile(path.join(profile,'updates',file),'utf8'));}catch{}}console.error(execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',"Get-CimInstance Win32_Process -Filter \"name = 'Daymark.exe'\" | Select-Object ProcessId,ParentProcessId,ExecutablePath,CommandLine | ConvertTo-Json"],{encoding:'utf8',windowsHide:true}));throw error;}
 finally{
  if(application)await application.close();
