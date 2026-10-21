@@ -20,18 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        exclude:
-          - os: ${{ github.event.inputs.platform == 'windows' && 'macos-latest' || 'none' }}
-        include:
-          - os: windows-latest
-            platform: win
-            arch: x64
-          - os: macos-latest
-            platform: mac
-            arch: arm64
-          - os: macos-latest
-            platform: mac
-            arch: x64
+        include: ${{ fromJSON(github.event.inputs.platform == 'windows' && '[{"os":"windows-latest","platform":"win","arch":"x64"}]' || '[{"os":"windows-latest","platform":"win","arch":"x64"},{"os":"macos-latest","platform":"mac","arch":"arm64"},{"os":"macos-latest","platform":"mac","arch":"x64"}]') }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
