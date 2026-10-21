@@ -4,6 +4,12 @@ on:
     tags: ['v*']
   pull_request:
   workflow_dispatch:
+    inputs:
+      platform:
+        description: Platforms to verify
+        type: choice
+        default: all
+        options: [all, windows]
 permissions:
   contents: read
 concurrency:
@@ -14,6 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        exclude:
+          - os: ${{ github.event.inputs.platform == 'windows' && 'macos-latest' || 'none' }}
         include:
           - os: windows-latest
             platform: win
