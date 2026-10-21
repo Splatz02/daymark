@@ -33,6 +33,7 @@ Both Mac packages are built on a native Mac runner. Automatic updates validate t
 - **Anytime:** unscheduled tasks you can pick up when there is room.
 - Drag work into In progress or into the green Done area. Completed cards leave the working board and can be restored from Completed.
 - Click a card to edit its notes, status, schedule, priority, effort estimate, or checklist. Calendar has month/week views and a daily list; there are no time blocks.
+- Drag a checklist step by its six-dot handle to reorder it. A line marks where it will land; checked steps keep their progress. You can also focus the handle and press the up/down arrow keys.
 - Delete confirmations automatically scroll into view. On recurring work, choose the template to delete the series or one date to remove just that occurrence.
 
 Recurrence supports every N days, selected weekdays every N weeks, and every N months. Weeks start on Monday. Monthly dates beyond a month's length use its final day without drifting. End dates are inclusive. Fresh checklists reset each occurrence; shared checklists carry checked steps forward. Notes and steps can be repeated on every occurrence or only the first.
