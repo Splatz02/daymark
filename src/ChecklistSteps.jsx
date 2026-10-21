@@ -19,9 +19,9 @@ export function ChecklistSteps({ checklist, onChange, checksDisabled }) {
   function autoScroll() {
     const drag = source.current, modal = listElement.current?.closest('.modal');
     if (!drag?.active || !modal) return;
-    const rect = modal.getBoundingClientRect();
+    const rect = modal.getBoundingClientRect(), listRect = listElement.current.getBoundingClientRect();
     if (drag.x >= rect.left && drag.x <= rect.right) {
-      const speed = drag.y < rect.top + 48 ? -12 : drag.y > rect.bottom - 48 ? 12 : 0;
+      const speed = drag.y < rect.top + 48 && listRect.top < rect.top + 20 ? -12 : drag.y > rect.bottom - 48 && listRect.bottom > rect.bottom - 20 ? 12 : 0;
       if (speed) { modal.scrollTop += speed; setTarget(placement(drag.x, drag.y)); }
     }
     scrollFrame.current = requestAnimationFrame(autoScroll);

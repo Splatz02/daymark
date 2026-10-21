@@ -1,6 +1,6 @@
 import React,{useEffect,useState} from 'react';
 import {Download,RefreshCw,CheckCircle2,AlertCircle,ArrowUpRight,ShieldCheck} from 'lucide-react';
-let state={status:'idle',currentVersion:'1.1.5',prompt:false};
+let state={status:'idle',currentVersion:'1.1.6',prompt:false};
 const listeners=new Set();let subscribed=false;
 function publish(value){state=value;listeners.forEach(fn=>fn(value));}
 function useUpdates(){const [value,setValue]=useState(state);useEffect(()=>{listeners.add(setValue);if(!subscribed&&window.daymark?.getUpdateState){subscribed=true;window.daymark.getUpdateState().then(publish).catch(()=>{});window.daymark.onUpdate(publish);}return()=>listeners.delete(setValue);},[]);return value;}

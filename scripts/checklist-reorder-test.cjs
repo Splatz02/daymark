@@ -7,14 +7,14 @@ const assert=require('node:assert/strict');const fs=require('node:fs/promises');
  try{
   const actualProfile=await app.evaluate(({app})=>app.getPath('userData'));
   assert.equal((await fs.realpath(actualProfile)).toLowerCase(),(await fs.realpath(profile)).toLowerCase(),'Refuse task changes outside the explicit temporary test profile.');
-  page=await app.firstWindow();const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  page=await app.firstWindow();await page.setViewportSize({width:960,height:660});const errors=[];page.on('pageerror',error=>{errors.push(error.message);console.error('Renderer error:',error);});
   await page.evaluate(()=>{window.checklistDragEvents=[];for(const name of ['pointerdown','pointermove','pointerup','pointercancel'])document.addEventListener(name,event=>{window.checklistDragEvents.push({name,target:event.target.tagName,clientX:event.clientX,clientY:event.clientY});},true);});
   await page.getByRole('button',{name:'New task'}).click();
   await page.getByRole('textbox',{name:'Task name',exact:true}).fill('Checklist order');
   async function addSteps(titles){for(const title of titles){await page.getByRole('textbox',{name:'Add a checklist step',exact:true}).fill(title);await page.getByRole('textbox',{name:'Add a checklist step',exact:true}).press('Enter');}}
   const values=()=>page.getByRole('list',{name:'Checklist steps',exact:true}).getByRole('textbox').evaluateAll(inputs=>inputs.map(input=>input.value));
   async function dragHandle(handle,row,after){
-   await handle.scrollIntoViewIfNeeded();await row.scrollIntoViewIfNeeded();const start=await handle.boundingBox(),finish=await row.boundingBox();
+   await row.evaluate(element=>element.scrollIntoView({block:'center'}));await handle.scrollIntoViewIfNeeded();const start=await handle.boundingBox(),finish=await row.boundingBox();
    await page.mouse.move(start.x+start.width/2,start.y+start.height/2);await page.mouse.down();await page.mouse.move(finish.x+100,finish.y+(after?finish.height-3:3),{steps:12});
    await expect(row).toHaveClass(after?/drop-after/:/drop-before/);await page.mouse.up();
   }
@@ -43,7 +43,7 @@ const assert=require('node:assert/strict');const fs=require('node:fs/promises');
   await dragHandle(page.getByRole('button',{name:'Reorder step 3',exact:true}),firstRow,false);await expect.poll(values).toEqual(['Publish','Prepare','Edit']);assert.equal(await page.getByRole('checkbox',{name:'Complete step 2',exact:true}).isChecked(),true);
   await page.getByRole('button',{name:'Cancel',exact:true}).click();await page.getByRole('button',{name:'Edit Checklist order',exact:true}).click();
   // Cancelling a drag does not change order, and editing text does not start a drag.
-  const handle=await page.getByRole('button',{name:'Reorder step 1',exact:true}).boundingBox();
+  await page.getByRole('button',{name:'Reorder step 1',exact:true}).scrollIntoViewIfNeeded();const handle=await page.getByRole('button',{name:'Reorder step 1',exact:true}).boundingBox();
   await page.mouse.move(handle.x+handle.width/2,handle.y+handle.height/2);await page.mouse.down();await page.mouse.move(handle.x+40,handle.y+45,{steps:6});await page.keyboard.press('Escape');await page.mouse.up();assert.deepEqual(await values(),['Prepare','Edit','Publish']);
   await page.getByRole('textbox',{name:'Step 2',exact:true}).fill('Edit carefully');await page.getByRole('button',{name:'Save changes',exact:true}).click();
   // An occurrence-specific reorder must not change the repeating template or future days.
@@ -59,8 +59,8 @@ const assert=require('node:assert/strict');const fs=require('node:fs/promises');
   const longHandle=page.getByRole('button',{name:'Reorder step 1',exact:true});await longHandle.scrollIntoViewIfNeeded();const start=await longHandle.boundingBox(),panel=await page.getByRole('dialog').boundingBox();
   await page.mouse.move(start.x+start.width/2,start.y+start.height/2);await page.mouse.down();await page.mouse.move(panel.x+100,panel.y+panel.height-12,{steps:10});
   const lastRow=page.getByRole('list',{name:'Checklist steps',exact:true}).getByRole('listitem').last();
-  await expect.poll(async()=>{const row=await lastRow.boundingBox();return row.y+row.height<panel.y+panel.height-85;},{timeout:10000}).toBe(true);
-  const finish=await lastRow.boundingBox();await page.mouse.move(finish.x+100,finish.y+finish.height-3,{steps:6});await page.mouse.up();await expect.poll(async()=>(await values()).at(-1)).toBe('Long step 1');
+  await expect.poll(async()=>{const row=await lastRow.boundingBox();return row.y+row.height<panel.y+panel.height-15;},{timeout:10000}).toBe(true);
+  await page.mouse.move(panel.x+100,panel.y+panel.height/2);await page.waitForTimeout(100);const finish=await lastRow.boundingBox();await page.mouse.move(finish.x+100,finish.y+finish.height-3,{steps:6});await page.mouse.up();await expect.poll(async()=>(await values()).at(-1)).toBe('Long step 1');
   assert.deepEqual(errors,[]);await fs.mkdir('artifacts',{recursive:true});await page.screenshot({path:'artifacts/checklist-reorder-tested.png',fullPage:true});
   console.log('PASS: real handle drag/drop, keyboard reordering/focus, checked state and stable IDs, cancel without saving, cancelled drag, text edits, save/reopen/reload persistence, isolated occurrence/template ordering, fresh next-day progress, and edge-scrolling to reorder a long checklist.');
  }catch(error){if(page){console.error('Drag events:',await page.evaluate(()=>window.checklistDragEvents?.slice(-25)));await fs.mkdir('artifacts',{recursive:true});await page.screenshot({path:'artifacts/checklist-reorder-failure.png',fullPage:true});}throw error;}
