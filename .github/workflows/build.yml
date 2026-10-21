@@ -1,7 +1,6 @@
 name: Build and release Daymark
 on:
   push:
-    branches: [main]
     tags: ['v*']
   pull_request:
   workflow_dispatch:
@@ -37,6 +36,7 @@ jobs:
       - run: npm run build
       - run: npm run test:desktop
       - run: node scripts/workspaces-test.cjs
+      - run: node scripts/workspace-transfer-test.cjs
       - run: npx electron-builder --${{ matrix.platform }} --${{ matrix.arch }} --publish never
       - if: matrix.platform == 'win'
         run: node scripts/test-windows-update.mjs

@@ -38,9 +38,10 @@ ipcMain.handle('data:save', async (event, data) => {
   });
   writeQueue = job; return job;
 });
-ipcMain.handle('backup:export', async (event, data) => {
+ipcMain.handle('backup:export', async (event, data, options = {}) => {
   assertSender(event);
-  const { canceled, filePath } = await dialog.showSaveDialog(window, { title: 'Export Daymark backup', defaultPath: `Daymark-${new Date().toISOString().slice(0,10)}.json`, filters: [{ name: 'Daymark backup', extensions: ['json'] }] });
+  const name=typeof options?.workspaceName==='string'?options.workspaceName.replace(/[<>:"/\\|?*\x00-\x1f]/g,'-').slice(0,80):'';
+  const { canceled, filePath } = await dialog.showSaveDialog(window, { title: name?'Export Daymark workspace':'Export Daymark backup', defaultPath: `Daymark-${name?name+'-':''}${new Date().toISOString().slice(0,10)}.json`, filters: [{ name: name?'Daymark workspace':'Daymark backup', extensions: ['json'] }] });
   if (canceled) return false;
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8'); return true;
 });

@@ -16,6 +16,37 @@ export function workspaceData(data, id = data.activeWorkspaceId) {
   const ids = new Set(tasks.map(t=>t.id));
   return {...data,tasks,overrides:Object.fromEntries(Object.entries(data.overrides).filter(([key])=>ids.has(key.split('@')[0]))),settings:{...data.settings,dailyCapacity:workspace.dailyCapacity}};
 }
+export function exportWorkspace(data, id = data.activeWorkspaceId) {
+  const workspace=data.workspaces.find(w=>w.id===id);
+  if(!workspace)throw new Error('Workspace not found.');
+  const {name,icon,color,dailyCapacity}=workspace;
+  const scoped=workspaceData(data,id);
+  // Build the backup explicitly: no other workspace metadata or global settings can travel with it.
+  return {schema:SCHEMA,exportScope:'workspace',workspaces:[{id,name,icon,color,dailyCapacity}],activeWorkspaceId:id,tasks:scoped.tasks,overrides:scoped.overrides,settings:{dailyCapacity},updatedAt:new Date().toISOString()};
+}
+export function importWorkspace(current, raw, targetId = current.activeWorkspaceId, mode = 'merge') {
+  if(!['merge','replace'].includes(mode))throw new Error('Choose Merge tasks or Replace tasks.');
+  if(!current.workspaces.some(w=>w.id===targetId))throw new Error('The destination workspace no longer exists.');
+  const incoming=validateData(raw);
+  if(incoming.workspaces.length!==1)throw new Error('Choose a single-workspace export. Use Import backup to restore all workspaces.');
+  const otherTasks=current.tasks.filter(t=>t.workspaceId!==targetId);
+  const otherIds=new Set(otherTasks.map(t=>t.id));
+  const incomingIds=new Set(incoming.tasks.map(t=>t.id));
+  const mapped=new Map(),used=new Set();
+  for(const task of incoming.tasks){
+    let id=task.id;
+    if(otherIds.has(id)){
+      id=`import:${targetId}:${task.id}`;
+      while(otherIds.has(id)||incomingIds.has(id)||used.has(id))id=`import:${id}`;
+    }
+    mapped.set(task.id,id);used.add(id);
+  }
+  const tasks=new Map((mode==='replace'?otherTasks:current.tasks).map(t=>[t.id,t]));
+  for(const task of incoming.tasks){const id=mapped.get(task.id);tasks.set(id,{...task,id,workspaceId:targetId});}
+  const overrides=mode==='replace'?Object.fromEntries(Object.entries(current.overrides).filter(([key])=>otherIds.has(key.split('@')[0]))):{...current.overrides};
+  for(const [key,value] of Object.entries(incoming.overrides)){const [id,date]=key.split('@');overrides[`${mapped.get(id)}@${date}`]=value;}
+  return {...current,tasks:[...tasks.values()],overrides,updatedAt:new Date().toISOString()};
+}
 export function removeWorkspace(data, id) {
   if(data.workspaces.length===1) throw new Error('Keep at least one workspace.');
   if(!data.workspaces.some(w=>w.id===id)) throw new Error('Workspace not found.');

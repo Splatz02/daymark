@@ -2,7 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('daymark', {
   load: () => ipcRenderer.invoke('data:load'),
   save: data => ipcRenderer.invoke('data:save', data),
-  exportBackup: data => ipcRenderer.invoke('backup:export', data),
+  exportBackup: (data,options) => ipcRenderer.invoke('backup:export', data,options),
   importBackup: () => ipcRenderer.invoke('backup:import'),
   getUpdateState: () => ipcRenderer.invoke('updates:get'),
   checkUpdates: () => ipcRenderer.invoke('updates:check'),

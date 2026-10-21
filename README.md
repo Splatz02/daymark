@@ -4,7 +4,9 @@ A local desktop planner for Windows and Mac, with separate workspaces, a working
 
 ## Upgrade your existing Windows app
 
-Close Daymark 1.0. Run **Daymark-1.1.0-Windows-x64.exe** and choose the same installation folder. Do **not** uninstall first. All task data remains in `%APPDATA%\Daymark\`, and the app automatically moves it into the **Personal** workspace. A separate `daymark-v1-backup.json` preserves the original data.
+If you have Daymark 1.1 or later, use **Settings & backups > Check for updates** to download the latest release and install/restart.
+
+If you still have 1.0, close it, run **Daymark-1.1.1-Windows-x64.exe**, and choose the same installation folder. Do **not** uninstall first. All task data remains in `%APPDATA%\Daymark\`, and the app automatically moves it into the **Personal** workspace. A separate `daymark-v1-backup.json` preserves the original data.
 
 The old 1.0 app has no updater, so this one-time installation is necessary. From 1.1 onward, Daymark checks GitHub for new releases and offers the update inside the app.
 
@@ -36,6 +38,19 @@ Both Mac packages are built on a native Mac runner. Automatic updates validate t
 Recurrence supports every N days, selected weekdays every N weeks, and every N months. Weeks start on Monday. Monthly dates beyond a month's length use its final day without drifting. End dates are inclusive. Fresh checklists reset each occurrence; shared checklists carry checked steps forward. Notes and steps can be repeated on every occurrence or only the first.
 
 ## Backups and transfers
+
+### Just the current workspace
+
+Under the workspace name at the top of **Settings & backups**, use **Export this workspace** to share only its tasks, notes, schedules, checklists, and completed/progress history. The exported file also includes that workspace's name, icon, color, and capacity. It contains no other workspace metadata or global settings.
+
+To receive a workspace file, switch to the destination workspace, open Settings, and choose **Import into this workspace**. The confirmation names the destination and offers:
+
+- **Merge tasks:** keep existing tasks and add or update the imported tasks and progress.
+- **Replace tasks:** remove only the destination workspace's tasks/history and replace them with the file.
+
+Both options preserve the destination's name, icon, color, and capacity, and leave every other workspace untouched. Task IDs that already belong to another workspace are remapped safely; repeating the import updates the same copied tasks. A file containing multiple workspaces is rejected by these controls.
+
+### All workspaces
 
 **Settings & backups > Export backup** exports **all workspaces** with tasks, recurrence, notes, progress, and history. Move the JSON file to the other computer and import it.
 
