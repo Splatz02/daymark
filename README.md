@@ -4,11 +4,11 @@ A local desktop planner for Windows and Mac, with separate workspaces, a working
 
 ## Upgrade your existing Windows app
 
-If you have Daymark 1.1 or later, use **Settings & backups > Check for updates** to download the latest release and install/restart.
+Daymark 1.1.2 repairs a Windows updater launch failure in 1.1.0 and 1.1.1. If Install & restart closes the old app without installing anything, close Daymark, run **Daymark-1.1.2-Windows-x64.exe**, and choose the same installation folder. Do **not** uninstall first. This one-time repair also includes individual workspace import/export.
 
-If you still have 1.0, close it, run **Daymark-1.1.1-Windows-x64.exe**, and choose the same installation folder. Do **not** uninstall first. All task data remains in `%APPDATA%\Daymark\`, and the app automatically moves it into the **Personal** workspace. A separate `daymark-v1-backup.json` preserves the original data.
+All task data remains in `%APPDATA%\Daymark\`. If upgrading from 1.0, the app automatically moves it into the **Personal** workspace and preserves the original data in `daymark-v1-backup.json`.
 
-The old 1.0 app has no updater, so this one-time installation is necessary. From 1.1 onward, Daymark checks GitHub for new releases and offers the update inside the app.
+After this repair, use **Settings & backups > Check for updates** to download future releases and install/restart. The app waits for the Windows installation helper to acknowledge startup before closing, logs installation failures in the data folder's `updates` directory, and checks that the running version matches a successful update receipt.
 
 Download official releases from https://github.com/Splatz02/daymark/releases/latest.
 

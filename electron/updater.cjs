@@ -2,6 +2,7 @@ const fs=require('node:fs/promises');
 const path=require('node:path');
 const {spawn}=require('node:child_process');
 const {API,RELEASES,selectRelease,downloadVerified}=require('./update-core.cjs');
+const {launchWindowsInstaller}=require('./windows-launcher.cjs');
 function createUpdater({app,send,flush,quit,openExternal,fetcher=fetch,platform=process.platform,arch=process.arch}){
  let state={status:'idle',currentVersion:app.getVersion(),prompt:false};
  let release=null,downloadPath=null,settings={remindAt:0},busy=false,lastCheck=0;
@@ -44,20 +45,24 @@ function createUpdater({app,send,flush,quit,openExternal,fetcher=fetch,platform=
    const record=path.join(directory(),'install-result.json');
    const before=path.join(app.getPath('userData'),`daymark-before-update-${app.getVersion()}-${Date.now()}.json`);
    await fs.copyFile(path.join(app.getPath('userData'),'daymark.json'),before);
-   const destination=process.platform==='darwin'?path.resolve(path.dirname(process.execPath),'../..'):path.dirname(process.execPath);
+   const destination=platform==='darwin'?path.resolve(path.dirname(process.execPath),'../..'):path.dirname(process.execPath);
    await fs.access(path.dirname(destination),require('node:fs').constants.W_OK);
-   const script=path.join(directory(),process.platform==='darwin'?'install-mac.sh':'install-windows.ps1');
-   await fs.copyFile(path.join(__dirname,process.platform==='darwin'?'install-mac.sh':'install-windows.ps1'),script);
-   const args=process.platform==='darwin'?[script,String(process.pid),downloadPath,destination,record,release.version]:['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',script,'-ParentProcess',String(process.pid),'-Installer',downloadPath,'-Destination',destination,'-ResultFile',record,'-Version',release.version];
-   const child=spawn(process.platform==='darwin'?'/bin/bash':'powershell.exe',args,{detached:true,stdio:'ignore',windowsHide:true});
-   await new Promise((resolve,reject)=>{child.once('spawn',resolve);child.once('error',reject);});child.unref();
+   const script=path.join(directory(),platform==='darwin'?'install-mac.sh':'install-windows.ps1');
+   await fs.copyFile(path.join(__dirname,platform==='darwin'?'install-mac.sh':'install-windows.ps1'),script);
+   await fs.writeFile(record,JSON.stringify({success:false,version:release.version,message:`The update to Daymark ${release.version} did not finish. Your task data is preserved. Try again from Settings & backups.`}));
+   if(platform==='win32'){
+    await launchWindowsInstaller({script,installer:downloadPath,destination,resultFile:record,version:release.version,userDataDirectory:app.getPath('userData')});
+   }else{
+    const child=spawn('/bin/bash',[script,String(process.pid),downloadPath,destination,record,release.version],{detached:true,stdio:'ignore'});
+    await new Promise((resolve,reject)=>{child.once('spawn',resolve);child.once('error',reject);});child.unref();
+   }
    quit();return state;
   }catch(error){busy=false;return emit({status:'error',error:`Could not install: ${error.message}`,prompt:true});}
  }
  async function defer(){settings.remindAt=Date.now()+24*60*60*1000;await preferences();return emit({prompt:false});}
  async function init(){
   try{settings=JSON.parse(await fs.readFile(settingsPath(),'utf8'));}catch{}
-  try{const receipt=JSON.parse((await fs.readFile(path.join(directory(),'install-result.json'),'utf8')).replace(/^\uFEFF/,''));state.receipt=receipt.success?`Updated to Daymark ${receipt.version}.`:receipt.message;}catch{}
+  try{const receipt=JSON.parse((await fs.readFile(path.join(directory(),'install-result.json'),'utf8')).replace(/^\uFEFF/,''));state.receipt=receipt.success&&receipt.version===app.getVersion()?`Updated to Daymark ${receipt.version}.`:receipt.success?`The update to Daymark ${receipt.version} did not apply. This copy is still ${app.getVersion()}. Try again from Settings & backups.`:receipt.message;}catch{}
   if(supported()){const initial=setTimeout(()=>check(false),8000);initial.unref();const timer=setInterval(()=>check(false),60*60*1000);timer.unref();}
  }
  return {init,state:()=>state,check,download,install,defer,openReleases:async()=>{await openExternal(RELEASES);return state;}};

@@ -40,6 +40,8 @@ jobs:
       - run: npx electron-builder --${{ matrix.platform }} --${{ matrix.arch }} --publish never
       - if: matrix.platform == 'win'
         run: node scripts/test-windows-update.mjs
+      - if: matrix.platform == 'win'
+        run: node scripts/test-windows-update-flow.mjs
       - if: matrix.platform == 'mac'
         run: node scripts/test-mac-update.mjs ${{ matrix.arch }}
       - uses: actions/upload-artifact@v4

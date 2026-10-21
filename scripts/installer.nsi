@@ -18,7 +18,13 @@ SetCompressor /SOLID lzma
 Section "Install"
   SetShellVarContext current
   SetOutPath "$INSTDIR"
+  ClearErrors
   File /r "${PROJECT_DIR}\release\win-unpacked\*.*"
+  IfErrors installFailed
+  FileOpen $R2 "$INSTDIR\daymark-version.txt" w
+  FileWrite $R2 "${VERSION}"
+  FileClose $R2
+  IfErrors installFailed
   WriteUninstaller "$INSTDIR\Uninstall Daymark.exe"
   ${GetParameters} $R0
   ClearErrors
@@ -36,6 +42,11 @@ Section "Install"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Daymark" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Daymark" "NoRepair" 1
   skipRegistration:
+  Goto installFinished
+  installFailed:
+  SetErrorLevel 1
+  Quit
+  installFinished:
 SectionEnd
 Section "Uninstall"
   SetShellVarContext current
