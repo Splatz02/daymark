@@ -2,15 +2,50 @@
 
 A local desktop planner for Windows and Mac, with separate workspaces, a working board, a calendar, and flexible recurring checklists.
 
-## Upgrade your existing Windows app
+## Download Daymark
 
-Daymark 1.1.3 repairs a Windows updater launch failure in 1.1.0 and 1.1.1. If Install & restart closes the old app without installing anything, close Daymark, run **Daymark-1.1.3-Windows-x64.exe**, and choose the same installation folder. Do **not** uninstall first. This one-time repair also includes individual workspace import/export.
+**Current version: 1.1.6.** All three downloads include the latest workspace, backup, updater, and checklist reordering features. No GitHub account or developer tools are needed.
 
-All task data remains in `%APPDATA%\Daymark\`. If upgrading from 1.0, the app automatically moves it into the **Personal** workspace and preserves the original data in `daymark-v1-backup.json`.
+Choose the download that matches your computer:
 
-After this repair, use **Settings & backups > Check for updates** to download future releases and install/restart. The app waits for the Windows installation helper to acknowledge startup before closing, logs installation failures in the data folder's `updates` directory, and checks that the running version matches a successful update receipt.
+| Your computer | Download | Installation steps |
+| --- | --- | --- |
+| **Windows PC** with a 64-bit Intel or AMD processor | [**Download for Windows (.exe)**](https://github.com/Splatz02/daymark/releases/download/v1.1.6/Daymark-1.1.6-Windows-x64.exe) | [Install on Windows](#install-on-windows) |
+| **Mac with Apple silicon** (an Apple M-series chip) | [**Download for Mac — Apple silicon (.zip)**](https://github.com/Splatz02/daymark/releases/download/v1.1.6/Daymark-1.1.6-Mac-arm64.zip) | [Install on Mac](#install-on-mac) |
+| **Mac with an Intel processor** | [**Download for Mac — Intel (.zip)**](https://github.com/Splatz02/daymark/releases/download/v1.1.6/Daymark-1.1.6-Mac-x64.zip) | [Install on Mac](#install-on-mac) |
 
-Download official releases from https://github.com/Splatz02/daymark/releases/latest.
+**Not sure which Mac you have?** Open **Apple menu > About This Mac**. If it says **Chip: Apple M…**, choose Apple silicon. If it says **Processor: Intel…**, choose Intel. See [Apple's guide to identifying your Mac](https://support.apple.com/en-us/116943).
+
+[Latest release and release notes](https://github.com/Splatz02/daymark/releases/latest) · [Transfer your tasks or a workspace](#backups-and-transfers)
+
+### Install on Windows
+
+1. Click **Download for Windows** above and save the `.exe` file.
+2. Open the downloaded installer, usually in your **Downloads** folder.
+3. Follow the setup wizard. Choose an installation folder, click **Install**, then leave **Open Daymark** selected and click **Finish**.
+4. Next time, open **Daymark** from your desktop shortcut or the Start menu. You can right-click its taskbar icon and choose **Pin to taskbar**.
+
+The installer is not signed with a publisher certificate. If Windows shows **Windows protected your PC** for this download and you trust this repository, choose **More info > Run anyway** to continue. [Microsoft explains this first-run prompt](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/publish-first-app#step-6-handle-smartscreen-for-new-apps).
+
+**Already have Daymark?** Normally, use **Settings & backups > Check for updates** inside the app. If you have Windows version **1.1.0 or 1.1.1**, or **Install & restart** closes the app without updating it, close Daymark and run the current Windows installer above, choosing the **same installation folder**. Do **not** uninstall first. This installs the updater repair and all later features while keeping your tasks and workspaces.
+
+### Install on Mac
+
+These steps apply to **both** Mac downloads. Choose Apple silicon or Intel using the table above.
+
+1. Download the matching Mac `.zip` file.
+2. In Finder, open **Downloads** and double-click the ZIP to extract **Daymark.app**. Finder may display its name as **Daymark**.
+3. In Finder, choose **Go > Home**. Open your **Applications** folder, or create a folder named **Applications** there if it does not exist.
+4. Drag the extracted **Daymark.app** into that folder, then double-click it to open it. Keeping the app in your own Applications folder lets Daymark install future updates there.
+5. Drag Daymark to the Dock if you want a shortcut for next time.
+
+**If macOS blocks the first launch:** Daymark is ad-hoc signed and is not Apple-notarized. After trying to open it, dismiss the warning and open **System Settings > Privacy & Security**. Scroll to the security section, choose **Open Anyway** beside Daymark, and confirm when prompted. This gives this app a first-launch exception. [Apple's instructions for opening a downloaded app](https://support.apple.com/en-us/102445).
+
+### Updates and moving between computers
+
+Once installed, Daymark checks for updates on both Windows and Mac. You can also open **Settings & backups > Check for updates**, download an available update, and choose **Install & restart**. Future updates do not require downloading another ZIP or installer manually.
+
+Your tasks are stored on your computer. To move work to another computer or share one workspace with a friend, use [export and import](#backups-and-transfers) inside Daymark. Installing the app starts with its own local data; it does not automatically copy your tasks from another computer.
 
 ## Workspaces
 
@@ -19,12 +54,6 @@ Use the workspace switcher at the top of the sidebar to switch, create, or edit 
 Delete a workspace from its editor by typing its name to confirm. This removes only that workspace and its tasks/history. You must keep at least one workspace. Export a backup first if you may want the workspace later.
 
 Workspaces organize your work locally. They do not share tasks with collaborators or sync across computers.
-
-## Install on Mac
-
-Choose **Mac-arm64.zip** for Apple silicon or **Mac-x64.zip** for Intel. Extract it, move **Daymark.app** into your home Applications folder, then open it and drag it to the Dock. This is a personal, ad-hoc-signed app, not an Apple-notarized distribution. If macOS blocks its first launch, use **System Settings > Privacy & Security > Open Anyway**.
-
-Both Mac packages are built on a native Mac runner. Automatic updates validate the new bundle's identity, version, checksum, and local code signature before replacing the installed app. Install in a folder you can write to; updates cannot replace an app in a read-only folder.
 
 ## Daily use
 
@@ -59,13 +88,13 @@ Both options preserve the destination's name, icon, color, and capacity, and lea
 - **Merge** retains local-only workspaces/tasks and applies imported versions when IDs overlap.
 - Daymark 1.0 backups are supported and migrate into Personal.
 
-Transfers are manual. Credentials and update downloads are not included in task exports. Desktop data is saved atomically to `daymark.json` with a previous-save `.bak` in `%APPDATA%\Daymark\` (Windows) or `~/Library/Application Support/Daymark/` (Mac). Updates create another data backup before installation. Mac updates keep a hidden prior `.app` beside the installed app for rollback.
+Transfers are manual. Credentials and update downloads are not included in task exports. Desktop data is saved atomically to `daymark.json` with a previous-save `.bak` in `%APPDATA%\Daymark\` (Windows) or `~/Library/Application Support/Daymark/` (Mac). Updates create another data backup before installation. Mac updates keep a hidden prior `.app` beside the installed app for rollback. Upgrading from Daymark 1.0 automatically moves existing data into the **Personal** workspace and preserves the original data in `daymark-v1-backup.json`.
 
 ## Updates
 
 Daymark checks the public `Splatz02/daymark` GitHub releases feed after startup and every six hours. Manual checks are in Settings & backups. Downloads start only when accepted and show byte/percentage progress. Install & restart applies the update after saving and backing up all workspaces. Remind me tomorrow snoozes notifications for 24 hours.
 
-Windows runs the downloaded installer against the existing installation directory and reopens Daymark. Mac validates and stages the new app beside the current app, waits for Daymark to quit, keeps the previous bundle, swaps in the new one, and reopens it. Failures are recorded and shown in Settings on the next launch. No app contains a GitHub token or signing secret. Downloads must match the exact release name, repository URL, size, and SHA-256 digest supplied by GitHub's HTTPS API.
+Windows runs the downloaded installer against the existing installation directory and reopens Daymark. The app waits for its installation helper to acknowledge startup before closing and checks that the running version matches a successful update receipt. Mac validates the new bundle's identity, version, and local code signature, stages it beside the current app, waits for Daymark to quit, keeps the previous bundle, swaps in the new one, and reopens it. The installed app must be in a folder you can write to. Failures are recorded in the data folder's `updates` directory and shown in Settings on the next launch. No app contains a GitHub token or signing secret. Downloads must match the exact release name, repository URL, size, and SHA-256 digest supplied by GitHub's HTTPS API.
 
 ## Development and future releases
 
@@ -88,5 +117,6 @@ For a new release:
 1. Update `package.json` and `package-lock.json` with a higher stable semantic version, and edit `RELEASE-NOTES.md`.
 2. Commit/push the source, then tag that commit `v<version>` and push the tag.
 3. GitHub Actions builds and checks all three platforms. It publishes a release only when every job passes and all expected files exist. Installed copies discover that published release.
+4. After publication, update the current version and the three download links at the top of this README to the newly published release. Verify that each link matches an uploaded release asset before pushing the README change.
 
 GitHub's built-in workflow token publishes release artifacts. No additional repository secrets are required. Keep release names in the configured `Daymark-<version>-Windows-x64.exe` / `Daymark-<version>-Mac-<arch>.zip` format because the updater intentionally rejects unexpected artifacts.
