@@ -18,5 +18,16 @@ test('a successful installer receipt cannot claim a different running version wa
   for(const [version,expected] of [['1.1.0',/did not apply.*still 1\.1\.0/],['1.2.0',/^Updated to Daymark 1\.2\.0\./]]){
    const engine=createUpdater({app:{isPackaged:false,getVersion:()=>version,getPath:()=>dir},send:()=>{}});await engine.init();assert.match(engine.state().receipt,expected);
   }
+  const newerApp=createUpdater({app:{isPackaged:false,getVersion:()=> '1.3.0',getPath:()=>dir},send:()=>{}});await newerApp.init();assert.equal(newerApp.state().receipt,undefined);
  }finally{await fs.rm(dir,{recursive:true,force:true});}
+});
+test('Windows helper startup failure keeps the app open with a recoverable update error',{skip:process.platform!=='win32'},async()=>{
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'daymark-update-install-failure-'));let quit=false;
+ try{
+  await fs.writeFile(path.join(dir,'daymark.json'),'{"tasks":["preserve my work"]}');
+  const engine=createUpdater({app:{isPackaged:true,getVersion:()=> '1.1.0',getPath:()=>dir},send:()=>{},flush:async()=>{},quit:()=>{quit=true;},platform:'win32',arch:'x64',fetcher:async url=>url.includes('/releases/latest')?Response.json(raw()):new Response(bytes)});
+  await engine.check();await engine.download();assert.equal(engine.state().status,'ready');await engine.install();
+  assert.equal(quit,false);assert.equal(engine.state().status,'error');assert.match(engine.state().error,/Could not install:.*before it was ready/);assert.equal(engine.state().prompt,true);
+  assert.equal(await fs.readFile(path.join(dir,'daymark.json'),'utf8'),'{"tasks":["preserve my work"]}');
+ }finally{await fs.rm(dir,{recursive:true,force:true,maxRetries:20,retryDelay:100});}
 });

@@ -1,6 +1,6 @@
 param([string]$RequestFile)
 $ErrorActionPreference='Stop'
-$request=Get-Content -LiteralPath $RequestFile -Raw | ConvertFrom-Json
+$request=Get-Content -LiteralPath $RequestFile -Raw -Encoding utf8 | ConvertFrom-Json
 $arguments=@('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',$request.script,'-ParentProcess',[string]$request.parentProcess,'-Installer',$request.installer,'-Destination',$request.destination,'-ResultFile',$request.resultFile,'-Version',$request.version,'-ReadyFile',$request.readyFile,'-UserDataDirectory',$request.userDataDirectory)
 # Start-Process creates an independent hidden console. Node's DETACHED_PROCESS flag
 # causes Windows PowerShell to exit before it executes the installer helper.

@@ -1,7 +1,7 @@
 const fs=require('node:fs/promises');
 const path=require('node:path');
 const {spawn}=require('node:child_process');
-const {API,RELEASES,selectRelease,downloadVerified}=require('./update-core.cjs');
+const {API,RELEASES,newer,selectRelease,downloadVerified}=require('./update-core.cjs');
 const {launchWindowsInstaller}=require('./windows-launcher.cjs');
 function createUpdater({app,send,flush,quit,openExternal,fetcher=fetch,platform=process.platform,arch=process.arch}){
  let state={status:'idle',currentVersion:app.getVersion(),prompt:false};
@@ -62,7 +62,12 @@ function createUpdater({app,send,flush,quit,openExternal,fetcher=fetch,platform=
  async function defer(){settings.remindAt=Date.now()+24*60*60*1000;await preferences();return emit({prompt:false});}
  async function init(){
   try{settings=JSON.parse(await fs.readFile(settingsPath(),'utf8'));}catch{}
-  try{const receipt=JSON.parse((await fs.readFile(path.join(directory(),'install-result.json'),'utf8')).replace(/^\uFEFF/,''));state.receipt=receipt.success&&receipt.version===app.getVersion()?`Updated to Daymark ${receipt.version}.`:receipt.success?`The update to Daymark ${receipt.version} did not apply. This copy is still ${app.getVersion()}. Try again from Settings & backups.`:receipt.message;}catch{}
+  try{
+   const receipt=JSON.parse((await fs.readFile(path.join(directory(),'install-result.json'),'utf8')).replace(/^\uFEFF/,''));
+   if(!receipt.success)state.receipt=receipt.message;
+   else if(receipt.version===app.getVersion())state.receipt=`Updated to Daymark ${receipt.version}.`;
+   else if(newer(receipt.version,app.getVersion()))state.receipt=`The update to Daymark ${receipt.version} did not apply. This copy is still ${app.getVersion()}. Try again from Settings & backups.`;
+  }catch{}
   if(supported()){const initial=setTimeout(()=>check(false),8000);initial.unref();const timer=setInterval(()=>check(false),60*60*1000);timer.unref();}
  }
  return {init,state:()=>state,check,download,install,defer,openReleases:async()=>{await openExternal(RELEASES);return state;}};
