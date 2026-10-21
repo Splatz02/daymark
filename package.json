@@ -1,0 +1,68 @@
+{
+  "name": "daymark",
+  "version": "1.1.0",
+  "description": "A calmer place for your work. Offline desktop planner with flexible recurring tasks.",
+  "author": "Daymark",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "start": "npm run build && electron .",
+    "test": "node --test tests/*.test.js",
+    "test:desktop": "node scripts/smoke.cjs",
+    "pack:win": "npm run build && electron-builder --win nsis --x64 --publish never",
+    "pack:mac": "npm run build && electron-builder --mac zip --arm64 --x64 --publish never"
+  },
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "electron": "^44.9.1",
+    "electron-builder": "^26.15.3",
+    "vite": "^8.3.4"
+  },
+  "build": {
+    "appId": "com.daymark.planner",
+    "productName": "Daymark",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json",
+      "assets/icon.png"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico",
+      "signExecutable": false,
+      "artifactName": "Daymark-${version}-Windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerLanguages": [
+        "en_US"
+      ],
+      "script": "scripts/installer.nsi"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.png",
+      "identity": "-",
+      "entitlements": "scripts/entitlements.mac.plist",
+      "entitlementsInherit": "scripts/entitlements.mac.plist",
+      "target": "zip",
+      "artifactName": "Daymark-${version}-Mac-${arch}.${ext}"
+    }
+  }
+}
