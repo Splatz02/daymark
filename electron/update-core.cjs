@@ -23,7 +23,7 @@ async function downloadVerified(release,directory,onProgress,fetcher=fetch){
  if(!response.ok||!response.body)throw new Error(`Download failed (${response.status}). Try again when you’re online.`);
  const file=await fs.open(temporary,'w');const hash=crypto.createHash('sha256');let received=0;
  try{
-  for await(const chunk of response.body){received+=chunk.length;if(received>release.size)throw new Error('The download is larger than the verified release.');hash.update(chunk);await file.write(chunk);onProgress({received,total:release.size,percent:received/release.size*100});}
+  for await(const chunk of response.body){received+=chunk.length;if(received>release.size)throw new Error('The download is larger than the verified release.');hash.update(chunk);await file.writeFile(chunk);onProgress({received,total:release.size,percent:received/release.size*100});}
   if(received!==release.size||hash.digest('hex')!==release.sha256)throw new Error('Update verification failed. The download was discarded.');
   await file.sync();await file.close();await fs.rename(temporary,destination);return destination;
  }catch(error){await file.close().catch(()=>{});await fs.unlink(temporary).catch(()=>{});throw error;}

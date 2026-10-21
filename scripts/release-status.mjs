@@ -1,0 +1,3 @@
+import {github,repository} from './github-api.mjs';
+const {workflow_runs:runs}=await github(`/repos/${repository}/actions/runs?per_page=3`);
+for(const run of runs){const {jobs}=await github(`/repos/${repository}/actions/runs/${run.id}/jobs?per_page=20`);console.log(JSON.stringify({id:run.id,sha:run.head_sha.slice(0,8),event:run.event,status:run.status,conclusion:run.conclusion,url:run.html_url,jobs:jobs.map(job=>({id:job.id,name:job.name,status:job.status,conclusion:job.conclusion,current:job.steps?.find(s=>s.status==='in_progress')?.name,failed:job.steps?.filter(s=>s.conclusion==='failure').map(s=>s.name)}))}));}

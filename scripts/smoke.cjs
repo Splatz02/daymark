@@ -42,7 +42,14 @@ const path = require('node:path');
     await page.locator('.task-card').dragTo(page.locator('.board-column.blue .column-heading'),{sourcePosition:{x:20,y:20}});
     await page.waitForTimeout(150);
     assert.equal(await page.locator('.board-column.blue .task-card').count(),1);
-    await page.locator('.task-card').dragTo(page.locator('.done-zone'),{sourcePosition:{x:20,y:20}});
+    // A second OS pointer drag immediately after moving/reparenting the source is unreliable
+    // on hosted runners. Use the browser's HTML drag events for the Done target.
+    const transfer=await page.evaluateHandle(()=>new DataTransfer());
+    await page.locator('.task-card').dispatchEvent('dragstart',{dataTransfer:transfer});
+    await page.locator('.done-zone').dispatchEvent('dragover',{dataTransfer:transfer});
+    await page.locator('.done-zone').dispatchEvent('drop',{dataTransfer:transfer});
+    await transfer.dispose();
+    await page.locator('.task-card').waitFor({state:'detached'});
     assert.equal(await page.locator('.task-card').count(),0);
     // Shared progress travels to the next date.
     await page.getByRole('button',{name:'New task'}).click();
