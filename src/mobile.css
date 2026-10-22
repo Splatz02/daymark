@@ -1,0 +1,187 @@
+/* Desktop rules stay in styles.css. Only these controls are hidden globally. */
+.mobile-navigation-toggle,
+.mobile-navigation-close,
+.mobile-navigation-backdrop,
+.mobile-calendar-summary,
+.mobile-calendar-hint,
+.mobile-done-copy { display: none; }
+
+@media (max-width: 760px), (max-width: 1024px) and (hover: none) and (pointer: coarse) {
+  button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+  .app-shell { min-height: 100dvh; }
+  .app-shell > main { margin-left: 0; width: 100%; min-width: 0; }
+  .main-inner { padding: 24px 16px max(24px, env(safe-area-inset-bottom)); }
+  .topbar { padding: max(8px, env(safe-area-inset-top)) 12px 8px; height: auto; min-height: 64px; gap: 8px; }
+  .mobile-navigation-toggle { display: flex; flex-shrink: 0; }
+  .topbar .breadcrumb { min-width: 0; flex: 1; flex-wrap: wrap; gap: 6px; overflow-wrap: anywhere; font-size: 11px; }
+  .breadcrumb > .workspace-icon { display: none; }
+  .top-actions { gap: 0; flex-shrink: 0; }
+  .save-state { display: none; }
+  .icon-button { min-width: 44px; min-height: 44px; justify-content: center; }
+  .sidebar { width: min(310px, 88vw); height: 100dvh; padding: max(28px, env(safe-area-inset-top)) 18px max(16px, env(safe-area-inset-bottom)); transform: translateX(-100%); visibility: hidden; overflow-y: auto; overscroll-behavior: contain; z-index: 31; }
+  .sidebar.navigation-open { transform: translateX(0); visibility: visible; }
+  .sidebar > .brand { margin: 0 0 28px 10px; }
+  .sidebar .nav { min-height: 46px; font-size: 14px; }
+  .sidebar-note { display: none; }
+  .sidebar-bottom { padding-top: 24px; }
+  .mobile-navigation-close { display: flex; position: absolute; right: 12px; top: max(16px, env(safe-area-inset-top)); }
+  .mobile-navigation-backdrop.is-open { display: block; position: fixed; inset: 0; background: #070b07b8; backdrop-filter: blur(4px); z-index: 30; }
+  .workspace-trigger { min-height: 64px; }
+  .workspace-trigger strong { font-size: 14px; }
+  .workspace-menu { min-width: 0; max-width: none; }
+  .workspace-choice > button:first-child { min-height: 48px; }
+  .create-workspace { min-height: 48px; font-size: 13px; }
+  .page-heading { align-items: stretch; flex-direction: column; gap: 18px; }
+  .page-heading h1 { font-size: clamp(26px, 6vw, 34px); line-height: 1.2; }
+  .page-heading p { max-width: none; font-size: 13px; line-height: 1.7; }
+  .page-heading > .primary { align-self: flex-start; min-height: 44px; padding: 12px 16px; font-size: 13px; }
+  .eyebrow { font-size: 9px; }
+  .day-overview { flex-direction: column; align-items: stretch; gap: 20px; padding: 18px; margin-top: 24px; }
+  .day-intro { min-width: 0; }
+  .day-intro h2 { font-size: 20px; }
+  .day-intro p { font-size: 12px; line-height: 1.6; }
+  .day-metrics { justify-content: space-between; border-top: 1px solid #35412e; padding-top: 16px; gap: 12px; }
+  .day-metrics > div > strong { font-size: 20px; }
+  .day-metrics > div > span { font-size: 11px; }
+  .day-progress { display: block; max-width: 160px; flex: 1; }
+  .board-toolbar { flex-direction: column; align-items: stretch; gap: 12px; }
+  .date-control { flex-wrap: wrap; gap: 2px; }
+  .date-picker { margin-left: auto; padding-left: 4px; }
+  .date-picker input { width: 132px; min-height: 44px; font-size: 16px; }
+  .toolbar-right { width: 100%; gap: 8px; }
+  .search { flex: 1; min-width: 0; min-height: 44px; }
+  .search input { width: 100%; min-width: 0; font-size: 16px; }
+  .filter-select { min-height: 44px; max-width: 130px; font-size: 13px; }
+  .board { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .board-column { min-width: 0; padding: 14px 12px 8px; }
+  .column-title h3 { font-size: 15px; }
+  .column-title { gap: 9px; }
+  .column-subtitle { font-size: 11px; margin: 0 0 16px 2px; }
+  .column-empty { min-height: 115px; padding: 20px 12px; }
+  .column-empty strong { font-size: 13px; }
+  .column-empty p { font-size: 11px; line-height: 1.7; }
+  .add-card { min-height: 44px; font-size: 13px; }
+  .task-card { padding: 14px 14px 0; }
+  .card-content h4 { font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+  .card-content p { font-size: 12px; line-height: 1.7; }
+  .card-more { min-width: 44px; min-height: 44px; margin: -8px -8px -4px 0; }
+  .card-bottom { min-height: 54px; }
+  .card-bottom > div { min-width: 0; flex-wrap: wrap; }
+  .card-bottom span { font-size: 11px; }
+  .complete-button { width: 44px; height: 44px; flex-shrink: 0; opacity: 1; }
+  .mini-check { font-size: 12px; }
+  .done-zone { margin-top: 18px; padding: 16px; }
+  .done-zone strong { font-size: 13px; }
+  .desktop-done-copy { display: none; }
+  .mobile-done-copy { display: inline; }
+  .done-zone p { font-size: 11px; }
+  .first-hint { flex-wrap: wrap; font-size: 12px; line-height: 1.7; }
+  .first-hint > span { max-width: calc(100% - 30px); }
+  .first-hint button { margin-left: 25px; min-height: 44px; font-size: 12px; }
+  .page-footer { flex-wrap: wrap; gap: 12px; line-height: 1.7; }
+  .calendar-layout { grid-template-columns: minmax(0, 1fr); }
+  .calendar-toolbar { flex-wrap: wrap; gap: 8px; padding: 12px; }
+  .calendar-toolbar > div:first-child { width: 100%; flex-wrap: wrap; }
+  .calendar-toolbar h2 { font-size: 17px; margin-right: auto; }
+  .calendar-toolbar .small { display: inline-flex; min-height: 44px; }
+  .segmented button { min-height: 44px; font-size: 13px; }
+  .calendar-weekdays { padding: 14px 0; }
+  .calendar-weekdays span { font-size: 9px; letter-spacing: 0; }
+  .calendar-cell, .week-grid .calendar-cell { min-height: 72px; padding: 7px 2px; }
+  .calendar-cell-heading { justify-content: center; margin-bottom: 6px; padding: 0; }
+  .calendar-cell-heading > span { font-size: 13px; width: 28px; height: 28px; }
+  .calendar-cell-heading button, .calendar-task, .more-tasks { display: none; }
+  .mobile-calendar-summary { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; color: #b8cd9f; }
+  .mobile-calendar-summary i { width: 4px; height: 4px; border-radius: 50%; background: #b8cd9f; }
+  .mobile-calendar-hint { display: block; padding: 14px 12px; font-size: 12px; color: #9caf8b; line-height: 1.5; }
+  .calendar-legend { flex-wrap: wrap; gap: 12px; padding: 0 12px 16px; font-size: 10px; }
+  .day-agenda { padding: 22px 16px; }
+  .day-agenda .agenda-date { font-size: 13px; }
+  .day-agenda > h2 { font-size: 23px; display: flex; margin-right: 0; }
+  .agenda-heading h3 { font-size: 14px; }
+  .agenda-item { gap: 8px; align-items: center; }
+  .agenda-check { width: 40px; height: 40px; flex-shrink: 0; }
+  .agenda-item-title strong { font-size: 14px; }
+  .agenda-item-title span, .agenda-footnote, .capacity-card p { font-size: 12px; }
+  .capacity-card small { font-size: 11px; }
+  .archive-toolbar { flex-wrap: wrap; gap: 16px; }
+  .archive-toolbar > span { font-size: 13px; }
+  .archive-row { padding: 16px 0; gap: 10px; }
+  .archive-title { min-width: 0; overflow-wrap: anywhere; }
+  .archive-title strong { font-size: 14px; }
+  .archive-title span { font-size: 11px; line-height: 1.5; }
+  .archive-row .secondary { min-height: 44px; }
+  .empty-archive { padding: 70px 10px; }
+  .empty-archive p { font-size: 13px; line-height: 1.7; }
+  .modal-backdrop { padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)); }
+  .modal, .modal.wide { width: 100%; max-height: 100%; max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))); border-radius: 12px; overscroll-behavior: contain; }
+  .modal-header { padding: 20px 16px; gap: 8px; }
+  .modal-header > div { min-width: 0; overflow-wrap: anywhere; }
+  .modal-header h2 { font-size: 23px; }
+  .modal-header p { font-size: 12px; line-height: 1.7; }
+  .editor-body, .workspace-editor-body { padding: 20px 16px; }
+  .modal input:not([type=checkbox]):not([type=radio]), .modal textarea, .modal select { font-size: 16px; min-height: 44px; max-width: 100%; }
+  .task-title-input { font-size: 21px !important; }
+  .field-label { font-size: 11px; line-height: 1.6; }
+  .editor-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .section-title h3 { font-size: 15px; }
+  .help-text, .info-note, .checkbox-label, .repeat-toggle { font-size: 12px; line-height: 1.7; }
+  .schedule-row { flex-wrap: wrap; gap: 16px; }
+  .schedule-row > label { min-width: 0; }
+  .repeat-toggle { min-height: 44px; }
+  .repeat-settings { padding: 14px 12px; }
+  .repeat-interval { flex-wrap: wrap; font-size: 13px; }
+  .weekday-picker { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+  .weekday-picker button { width: 100%; height: 40px; font-size: 13px; }
+  .end-date { flex-wrap: wrap; gap: 8px; font-size: 12px; }
+  .end-date span { width: 100%; }
+  .edit-scope { flex-wrap: wrap; gap: 10px; padding: 14px 16px; }
+  .edit-scope .segmented { display: flex; flex-wrap: wrap; }
+  .edit-scope .segmented button { font-size: 12px; }
+  .editor-checklist { padding: 10px 8px; }
+  .edit-check { gap: 7px; }
+  .edit-check input:not([type=checkbox]) { width: 0; flex: 1; padding-left: 0; padding-right: 0; }
+  .edit-check .checklist-drag-handle { width: 34px; height: 44px; }
+  .edit-check > button:last-child { min-width: 32px; height: 44px; justify-content: center; }
+  .new-check { gap: 6px; }
+  .new-check input { width: 0; min-width: 0; }
+  .new-check button { min-width: 38px; min-height: 44px; font-size: 13px; }
+  .behavior-option { padding: 12px 10px; gap: 9px; }
+  .behavior-option strong { font-size: 13px; }
+  .behavior-option p { font-size: 11px; }
+  .modal-footer { position: sticky; bottom: 0; z-index: 2; padding: 14px 16px; flex-wrap: wrap; gap: 12px; }
+  .modal-footer > div { flex: 1; justify-content: flex-end; flex-wrap: wrap; }
+  .modal-footer select { flex-basis: 100%; max-width: none; width: 100%; }
+  .modal-footer .primary, .modal-footer .secondary, .danger-link, .danger-button { min-height: 44px; font-size: 13px; }
+  .delete-confirm, .workspace-delete { padding: 20px 16px; overflow-wrap: anywhere; }
+  .delete-confirm { scroll-margin-bottom: 0; }
+  .delete-confirm p { font-size: 12px; line-height: 1.7; }
+  .delete-confirm button { margin-top: 10px; }
+  .workspace-color-picker { gap: 8px; flex-wrap: wrap; }
+  .color-dot { width: 34px; height: 34px; }
+  .workspace-icon-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .workspace-icon-grid button { min-height: 44px; }
+  .icon-picker-heading { flex-wrap: wrap; gap: 12px; }
+  .icon-picker-heading input { width: 100%; }
+  .workspace-preview { align-items: flex-start; }
+  .workspace-preview > .workspace-icon { flex-shrink: 0; }
+  .workspace-preview > div { min-width: 0; }
+  .settings-section { padding: 22px 16px; }
+  .settings-section h3 { overflow-wrap: anywhere; font-size: 15px; }
+  .settings-section > p, .settings-section .info-note, .import-info p { font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+  .backup-buttons { flex-wrap: wrap; }
+  .backup-buttons > button { min-height: 44px; font-size: 13px; }
+  .import-info { padding: 20px 16px; }
+  .update-status { font-size: 12px; overflow-wrap: anywhere; }
+  .toast { left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); transform: none; width: auto; max-width: none; gap: 10px; padding: 14px; font-size: 12px; }
+  .toast > span { min-width: 0; overflow-wrap: anywhere; }
+  .toast > button { min-width: 40px; min-height: 40px; }
+  .error-banner { flex-wrap: wrap; padding: 16px; font-size: 13px; line-height: 1.6; }
+}
+
+@media (max-width: 380px) {
+  .day-progress { display: none; }
+  .calendar-toolbar h2 { width: 100%; margin: 0; }
+  .date-picker { margin-left: 0; }
+  .modal-footer > .danger-link { width: 100%; }
+}

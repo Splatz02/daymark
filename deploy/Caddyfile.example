@@ -1,0 +1,12 @@
+# Add this site block to your existing Caddyfile; replace the domain.
+daymark.example.com {
+    root * /var/www/daymark
+    encode zstd gzip
+
+    @html path / /index.html
+    header @html Cache-Control "no-cache"
+    @assets path /assets/*
+    header @assets Cache-Control "public, max-age=31536000, immutable"
+
+    file_server
+}

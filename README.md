@@ -2,6 +2,8 @@
 
 A local desktop planner for Windows and Mac, with separate workspaces, a working board, a calendar, and flexible recurring checklists.
 
+**Want to host Daymark on a VPS or use it in your phone's browser?** The web build adapts to phones and tablets while keeping the desktop layout. See the [web hosting and deployment guide](DEPLOYMENT.md) for building, serving it on your domain, and updating an existing hosted copy. Browser data stays local to each browser; transfers use export/import.
+
 ## Download Daymark
 
 **Current version: 1.1.6.** All three downloads include the latest workspace, backup, updater, and checklist reordering features. No GitHub account or developer tools are needed.

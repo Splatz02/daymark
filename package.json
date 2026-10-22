@@ -12,6 +12,7 @@
     "start": "npm run build && electron .",
     "test": "node --test tests/*.test.js",
     "test:desktop": "node scripts/smoke.cjs",
+    "test:web": "npm run build && node scripts/responsive-test.mjs",
     "pack:win": "npm run build && electron-builder --win nsis --x64 --publish never",
     "pack:mac": "npm run build && electron-builder --mac zip --arm64 --x64 --publish never"
   },
