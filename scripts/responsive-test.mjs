@@ -37,7 +37,8 @@ try{
    // Keep mobile viewport metrics intact, including landscape pointer queries.
    await page.screenshot({path:`artifacts/responsive/${engine.name()}-${viewport.width}-${name}.png`,animations:'disabled',caret:'hide'});
   }
-  async function navigate(name){await page.getByRole('button',{name:'Open navigation',exact:true}).tap();await page.getByRole('button',{name,exact:true}).tap();await expect(page.getByRole('button',{name:'Open navigation',exact:true})).toHaveAttribute('aria-expanded','false');}
+  async function unlocked(){await expect.poll(()=>page.evaluate(()=>document.body.style.overflow)).toBe('');}
+  async function navigate(name){await page.getByRole('button',{name:'Open navigation',exact:true}).tap();await page.getByRole('button',{name,exact:true}).tap();await expect(page.getByRole('button',{name:'Open navigation',exact:true})).toHaveAttribute('aria-expanded','false');await unlocked();}
   await expect(page.getByRole('button',{name:'Open navigation',exact:true})).toBeVisible();await fits('board');
   await page.getByRole('button',{name:'Open navigation',exact:true}).tap();await fits('navigation');
   await page.getByRole('button',{name:'Close navigation',exact:true}).tap();
@@ -75,7 +76,7 @@ try{
   const saved=await download;const payload=JSON.parse(await fs.readFile(await saved.path(),'utf8'));assert.equal(payload.tasks.length,2);
   const chooser=page.waitForEvent('filechooser');await page.getByRole('button',{name:'Import into this workspace',exact:true}).tap();
   await (await chooser).setFiles({name:'sample-workspace.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(payload))});
-  await fits('import');await page.getByRole('button',{name:'Merge tasks',exact:true}).tap();
+  await fits('import');await page.getByRole('button',{name:'Merge tasks',exact:true}).tap();await unlocked();
   await page.getByRole('button',{name:'Open settings',exact:true}).tap();
   await page.getByRole('button',{name:'Edit workspace',exact:true}).tap();await fits('workspace');
   await page.getByRole('textbox',{name:'Workspace name',exact:true}).fill('A workspace with a longer name');await page.getByRole('button',{name:'Save workspace',exact:true}).tap();
@@ -86,7 +87,7 @@ try{
   await expect(page.locator('.board-column.blue .task-card')).toHaveCount(1);
   await page.getByRole('button',{name:'Edit Edit the next video with a longer title',exact:true}).tap();
   await page.getByRole('button',{name:'Delete',exact:true}).tap();await expect(page.getByRole('button',{name:'Delete task',exact:true})).toBeInViewport();await fits('delete');
-  await page.getByRole('button',{name:'Keep task',exact:true}).tap();await page.getByRole('button',{name:'Cancel',exact:true}).tap();
+  await page.getByRole('button',{name:'Keep task',exact:true}).tap();await page.getByRole('button',{name:'Cancel',exact:true}).tap();await unlocked();
   if(viewport.width===390){
    await page.getByRole('button',{name:'Open navigation',exact:true}).tap();
    await page.getByRole('button',{name:'Switch workspace',exact:true}).tap();await page.getByRole('button',{name:'Create workspace',exact:true}).tap();
