@@ -1,5 +1,6 @@
 import {chromium, webkit, expect} from '@playwright/test';
 import {spawn} from 'node:child_process';
+import {stripVTControlCharacters} from 'node:util';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {emptyData} from '../src/model.js';
@@ -11,7 +12,7 @@ const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','
 let output='';
 await new Promise((resolve,reject)=>{
  const timeout=setTimeout(()=>reject(new Error('Web preview did not start: '+output)),20000);
- server.stdout.on('data',chunk=>{output+=chunk;if(output.includes('127.0.0.1:'+port)){clearTimeout(timeout);resolve();}});
+ server.stdout.on('data',chunk=>{output+=chunk;if(stripVTControlCharacters(output).includes('127.0.0.1:'+port)){clearTimeout(timeout);resolve();}});
  server.stderr.on('data',chunk=>{output+=chunk;});
  server.on('error',reject);server.on('exit',code=>{clearTimeout(timeout);reject(new Error('Web preview exited '+code+': '+output));});
 }).catch(error=>{server.kill();throw error;});
